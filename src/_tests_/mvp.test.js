@@ -22,7 +22,7 @@ describe("Pizza test, sprint 3 challenge", () => {
     expect(orderPizza).toBeInTheDocument();
   })
 
-  it('From homepage "/" route, click #order-pizza, navigate to "/pizza" route', () => {
+  it('From homepage "/index.html" route, click #order-pizza, navigate to "/pizza" route', () => {
     const history = createMemoryHistory()
     render(
       <Router history={history}>
