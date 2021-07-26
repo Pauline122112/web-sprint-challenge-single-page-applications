@@ -1,124 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { Switch, Route } from 'react-router-dom'
-import Home from './components/Home'
-import Completion from './components/PizzaCheckout'
-import Form from './components/OrderForm'
-import * as yup from 'yup'
-import axios from 'axios'
-import './App.css'
+// 👉 STEP 2 - React Router imports (Route, Link and Switch)
+import { Route, Link, Switch } from "react-router-dom";
+import Home from "./Home";
+import OrderForm from "./Form/App";
 
-const initialFormValues = {
-  //Text
-  username: '',
-  special: '',
-  //dropdown
-  size: '',
-  //checkboxes
-  chicken: false,
-  cheese: false,
-  pineapple: false,
-  mushroom: false,
-
-};
-
-const initialFormErrors = {
-  username: '',
-  special: '',
-  size: '',
+function fetchStock() {
+	return Promise.resolve({ success: true });
 }
-const pizzaList = [];
-const initialDisabled = true
 
 export default function App() {
+	const [stock, setStock] = useState([]);
 
-  const [pizzas, setPizzas] = useState(pizzaList);
-  const [formValues, setFormValues] = useState(initialFormValues); // object
-  const [formErrors, setFormErrors] = useState(initialFormErrors); // object
-  const [disabled, setDisabled] = useState(initialDisabled); // boolean
+	useEffect(() => {
+		fetchStock().then((res) => setStock(res.data));
+	}, []);
 
+	// Make Links to navigate Home (`/`) and to order Pizza (`/pizza`)
 
- const orderSubmitted = (newPizza) => {
-    return setPizzas(formValues)
-  }
-  const postNewPizza = (newPizza) => {
-    axios
-      .post("https://reqres.in/api/orders", newPizza)
-      .then((res) => {
-        setPizzas([...pizzas, res.data.data]);
-        setFormValues(initialFormValues);
-        console.log(`HERE is postNewPizza`, postNewPizza);
-      })
-      .catch((err) => {
-        debugger;
-        console.log(err);
-      })
-      .finally(() => {});
-  };
+	return (
+		<div className="App">
+			<nav>
+				<h1 className="store-header">LAMBDA&apos;s AMAZING PIZZARIA!</h1>
+				<div className="nav-links">
+					<Link to="/">Home</Link>
+					<Link to="/pizza">Order Online</Link>
+				</div>
+			</nav>
 
+			{/* Adding Switch with a Route for each of the components imported at the top - don't need to use exact when using switch*/}
+			<Switch>
+				<Route path="/pizza">
+					<OrderForm items={stock} />
+				</Route>
 
+				<Route path="/">
+					<Home />
+				</Route>
 
-  const inputChange = (name, value) => {
-
-  }
-  const formSubmit = () => {
-    const newPizza = {
-      username: formValues.username.trim(),
-      special: formValues.special.trim(),
-      size: formValues.size.trim(),
-      toppings: ['ham', 'olives', 'onions', 'cheese'].filter(tops => formValues[tops] ),
-    }
-    postNewPizza(newPizza)
-  };
-
-  useEffect(() => {
-    // getPizzas();
-  }, [])
-  useEffect(() => {}, []);
-
-
-
-
-  return (
-
-
-    <div>
-      <Home id="order-pizza" 
-        // values={formValues} 
-        // update={updateForm} 
-        // submit={submitForm}
-        />
-        {/* <Link to='/'>HOME</Link> */}
-      <Switch>
-      <Route path='/pizza/complete'>
-            {/* Route to Success Page */}
-            <Completion
-             change={inputChange} 
-             values={formValues} 
-             submit={formSubmit}
-             orders={pizzas}
-            />
-          </Route>
-{/* may need exact  */}
-        <Route path="/pizza">
-          <Form
-            values={formValues}
-            change={inputChange}
-            submit={formSubmit}
-         
-            errors={formErrors}
-          />
-        </Route>
-
-        <Route exact path='/'>
-          
-        </Route>
-
-
-      </Switch>
-    
-
-    </div>
-
-
-  );
+				<Route>
+					<Home />
+				</Route>
+			</Switch>
+		</div>
+	);
 }
